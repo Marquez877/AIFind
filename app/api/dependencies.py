@@ -5,7 +5,14 @@ from app.infrastructure.ai.embedding_service import EmbeddingService
 from app.infrastructure.repositories.chunk_repository import ChunkRepository
 from app.providers import AIProvider, ConversationRepository, CustomerRepository, DocumentRepository, PersonRepository
 from app.use_cases.conversations import CreateConversationUseCase, SendMessageUseCase
+from app.use_cases.rag import AskQuestionUseCase
 from app.use_cases.rag.semantic_search import SemanticSearchUseCase
+from app.use_cases.documents import (
+	DeleteDocumentUseCase,
+	GetDocumentUseCase,
+	ListDocumentsUseCase,
+	UploadDocumentUseCase,
+)
 from app.use_cases.customers import (
 	CreateCustomerUseCase,
 	DeleteCustomerUseCase,
@@ -136,12 +143,7 @@ async def get_delete_person_uc(
 
 
 # Document use cases
-from app.use_cases.documents import (
-	DeleteDocumentUseCase,
-	GetDocumentUseCase,
-	ListDocumentsUseCase,
-	UploadDocumentUseCase,
-)
+
 
 
 async def get_upload_document_uc(
@@ -173,7 +175,6 @@ async def get_delete_document_uc(
 
 
 # RAG use case
-from app.use_cases.rag import AskQuestionUseCase
 
 
 

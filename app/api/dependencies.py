@@ -37,6 +37,7 @@ from app.use_cases.persons import (
 	UpdatePersonUseCase,
 )
 from app.wiring import (
+	build_user_repository,
 	build_ai_provider,
 	build_chunk_repository,
 	build_conversation_repository,
@@ -242,7 +243,7 @@ async def get_semantic_search_uc(
 
 
 # User repository and auth
-from app.wiring import build_user_repository
+
 
 
 async def get_user_repo(session: AsyncSession = Depends(get_session_dependency)) -> UserRepository:

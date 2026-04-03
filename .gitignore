@@ -57,7 +57,7 @@ htmlcov/
 
 # Byte-compiled / optimized / DLL files
 *.pyc
-
+docs/
 # Distribution / packaging
 *.manifest
 *.spec

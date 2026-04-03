@@ -13,6 +13,14 @@ from app.infrastructure.repositories.user_repository import UserRepository
 from app.domain.entities import User
 from app.providers import AIProvider, ConversationRepository, CustomerRepository, DocumentRepository, PersonRepository
 from app.use_cases.conversations import CreateConversationUseCase, SendMessageUseCase
+from app.use_cases.rag import AskQuestionUseCase
+from app.use_cases.rag.semantic_search import SemanticSearchUseCase
+from app.use_cases.documents import (
+	DeleteDocumentUseCase,
+	GetDocumentUseCase,
+	ListDocumentsUseCase,
+	UploadDocumentUseCase,
+)
 from app.use_cases.customers import (
 	CreateCustomerUseCase,
 	DeleteCustomerUseCase,
@@ -168,12 +176,7 @@ async def get_delete_person_uc(
 
 
 # Document use cases
-from app.use_cases.documents import (
-	DeleteDocumentUseCase,
-	GetDocumentUseCase,
-	ListDocumentsUseCase,
-	UploadDocumentUseCase,
-)
+
 
 
 async def get_upload_document_uc(
@@ -215,8 +218,7 @@ async def get_delete_document_uc(
 
 
 # RAG use case
-from app.use_cases.rag import AskQuestionUseCase
-from app.use_cases.rag.semantic_search import SemanticSearchUseCase
+
 
 
 async def get_ask_question_uc(

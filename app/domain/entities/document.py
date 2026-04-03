@@ -11,6 +11,7 @@ class Document:
     person_id: UUID  # Связь с карточкой человека
     filename: str  # Имя файла
     content: str  # Содержимое документа
+    original_file_path: str | None = None  # Путь к оригинальному файлу (PDF)
     uploaded_at: datetime = field(default_factory=datetime.utcnow)
 
     def __post_init__(self) -> None:

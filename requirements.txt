@@ -16,3 +16,6 @@ openai
 # Authentication (JWT)
 passlib[bcrypt]
 python-jose[cryptography]
+
+# PDF parsing
+pdfplumber

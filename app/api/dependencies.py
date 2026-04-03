@@ -6,6 +6,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.infrastructure.ai.embedding_service import EmbeddingService
 from app.infrastructure.auth import JWTHandler
+from app.infrastructure.parsers import ParserFactory
+from app.infrastructure.storage import LocalDocumentStorage
 from app.infrastructure.repositories.chunk_repository import ChunkRepository
 from app.infrastructure.repositories.user_repository import UserRepository
 from app.domain.entities import User
@@ -32,10 +34,25 @@ from app.wiring import (
 	build_conversation_repository,
 	build_customer_repository,
 	build_document_repository,
+	build_document_storage,
 	build_embedding_service,
 	build_person_repository,
 	get_session_dependency,
 )
+
+
+# Singleton для ParserFactory (stateless)
+_parser_factory = ParserFactory()
+
+
+def get_parser_factory() -> ParserFactory:
+	"""Get the parser factory instance."""
+	return _parser_factory
+
+
+def get_document_storage() -> LocalDocumentStorage:
+	"""Get local storage for original document files."""
+	return build_document_storage()
 
 
 async def get_customer_repo(session: AsyncSession = Depends(get_session_dependency)) -> CustomerRepository:
@@ -164,8 +181,17 @@ async def get_upload_document_uc(
 	document_repo: DocumentRepository = Depends(get_document_repo),
 	chunk_repo: ChunkRepository = Depends(get_chunk_repo),
 	embedding_service: EmbeddingService = Depends(get_embedding_service),
+	parser_factory: ParserFactory = Depends(get_parser_factory),
+	document_storage: LocalDocumentStorage = Depends(get_document_storage),
 ) -> UploadDocumentUseCase:
-	return UploadDocumentUseCase(person_repo, document_repo, chunk_repo, embedding_service)
+	return UploadDocumentUseCase(
+		person_repo,
+		document_repo,
+		chunk_repo,
+		embedding_service,
+		parser_factory,
+		document_storage,
+	)
 
 
 async def get_list_documents_uc(
@@ -183,8 +209,9 @@ async def get_get_document_uc(
 
 async def get_delete_document_uc(
 	document_repo: DocumentRepository = Depends(get_document_repo),
+	document_storage: LocalDocumentStorage = Depends(get_document_storage),
 ) -> DeleteDocumentUseCase:
-	return DeleteDocumentUseCase(document_repo)
+	return DeleteDocumentUseCase(document_repo, document_storage)
 
 
 # RAG use case

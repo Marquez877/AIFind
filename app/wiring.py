@@ -4,6 +4,7 @@ from app.config import settings
 from app.infrastructure.ai.claude_client import ClaudeClient
 from app.infrastructure.ai.embedding_service import EmbeddingService
 from app.infrastructure.db.session import get_session
+from app.infrastructure.storage import LocalDocumentStorage
 from app.infrastructure.repositories import (
     SQLAlchemyConversationRepository,
     SQLAlchemyCustomerRepository,
@@ -42,6 +43,10 @@ def build_ai_provider() -> AIProvider:
 
 def build_embedding_service() -> EmbeddingService:
     return EmbeddingService(api_key=settings.OPENAI_API_KEY)
+
+
+def build_document_storage() -> LocalDocumentStorage:
+    return LocalDocumentStorage(base_dir=settings.DOCUMENTS_STORAGE_DIR)
 
 
 def build_person_conversation_repository(session: AsyncSession) -> PersonConversationRepository:

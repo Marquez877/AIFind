@@ -10,6 +10,7 @@ class DocumentResponse(BaseModel):
     id: UUID
     person_id: UUID
     filename: str
+    original_file_path: str | None = None
     uploaded_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
@@ -22,6 +23,7 @@ class DocumentContentResponse(BaseModel):
     person_id: UUID
     filename: str
     content: str
+    original_file_path: str | None = None
     uploaded_at: datetime
 
     model_config = ConfigDict(from_attributes=True)

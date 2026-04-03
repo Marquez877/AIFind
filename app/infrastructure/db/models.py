@@ -175,6 +175,7 @@ class DocumentModel(Base):
     )
     filename: Mapped[str] = mapped_column(String(255), nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)
+    original_file_path: Mapped[str | None] = mapped_column(String(1024), nullable=True)
     uploaded_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,

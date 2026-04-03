@@ -21,6 +21,7 @@ class SQLAlchemyDocumentRepository(DocumentRepository):
             person_id=model.person_id,
             filename=model.filename,
             content=model.content,
+            original_file_path=model.original_file_path,
             uploaded_at=model.uploaded_at,
         )
 
@@ -31,6 +32,7 @@ class SQLAlchemyDocumentRepository(DocumentRepository):
             person_id=entity.person_id,
             filename=entity.filename,
             content=entity.content,
+            original_file_path=entity.original_file_path,
             uploaded_at=entity.uploaded_at,
         )
 
@@ -64,6 +66,7 @@ class SQLAlchemyDocumentRepository(DocumentRepository):
         else:
             model.filename = document.filename
             model.content = document.content
+            model.original_file_path = document.original_file_path
 
         await self._session.commit()
         await self._session.refresh(model)

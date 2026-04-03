@@ -13,6 +13,7 @@ from app.api.dependencies import (
 from app.api.v1.schemas import DocumentContentResponse, DocumentResponse
 from app.domain.entities import User
 from app.domain.errors import DocumentNotFoundError, PersonNotFoundError
+from app.domain.value_objects.document_type import DocumentType
 from app.use_cases.documents import (
     DeleteDocumentUseCase,
     GetDocumentUseCase,
@@ -23,7 +24,8 @@ from app.use_cases.documents import (
 
 router = APIRouter(tags=["documents"])
 
-ALLOWED_EXTENSIONS = {".txt", ".md"}
+# Поддерживаемые форматы: .txt, .md, .pdf
+ALLOWED_EXTENSIONS = {".txt", ".md", ".pdf", ".markdown"}
 
 
 @router.post(
@@ -37,7 +39,13 @@ async def upload_document(
     use_case: UploadDocumentUseCase = Depends(get_upload_document_uc),
     current_user: User = Depends(get_current_user),
 ) -> DocumentResponse:
-    """Загрузить документ к карточке (.txt или .md)."""
+    """
+    Загрузить документ к карточке.
+
+    Поддерживаемые форматы:
+    - `.txt`, `.md` — текстовые файлы (UTF-8, CP1251, Latin-1)
+    - `.pdf` — PDF документы (извлекается текст)
+    """
     if not file.filename:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -48,34 +56,35 @@ async def upload_document(
     if ext not in ALLOWED_EXTENSIONS:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Разрешены только файлы {ALLOWED_EXTENSIONS}",
+            detail=f"Неподдерживаемый формат файла. Разрешены: {', '.join(sorted(ALLOWED_EXTENSIONS))}",
         )
 
-    try:
-        content_bytes = await file.read()
-        content = content_bytes.decode("utf-8")
-    except UnicodeDecodeError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Файл должен быть в кодировке UTF-8",
-        ) from exc
+    # Читаем файл как бинарные данные
+    content_bytes = await file.read()
 
-    if not content.strip():
+    if not content_bytes:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Файл не может быть пустым",
         )
 
     try:
+        # Use case теперь сам определяет тип и парсит файл
         document = await use_case.execute(
             person_id=str(person_id),
             filename=file.filename,
-            content=content,
+            content=content_bytes,  # Передаём байты
         )
     except PersonNotFoundError as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Карточка не найдена",
+        ) from exc
+    except ValueError as exc:
+        # Ошибки парсинга (PDF защищён паролем, не удалось извлечь текст и т.д.)
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
         ) from exc
 
     return DocumentResponse.model_validate(document)

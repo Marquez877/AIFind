@@ -11,6 +11,7 @@ from app.infrastructure.repositories import (
     SQLAlchemyPersonRepository,
 )
 from app.infrastructure.repositories.chunk_repository import ChunkRepository
+from app.infrastructure.repositories.person_conversation_repository import PersonConversationRepository
 from app.providers import AIProvider, ConversationRepository, CustomerRepository, DocumentRepository, PersonRepository
 
 
@@ -40,6 +41,10 @@ def build_ai_provider() -> AIProvider:
 
 def build_embedding_service() -> EmbeddingService:
     return EmbeddingService(api_key=settings.OPENAI_API_KEY)
+
+
+def build_person_conversation_repository(session: AsyncSession) -> PersonConversationRepository:
+    return PersonConversationRepository(session)
 
 
 get_session_dependency = get_session

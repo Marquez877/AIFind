@@ -126,6 +126,17 @@ class PersonModel(Base):
     region: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
     accusation: Mapped[str] = mapped_column(String(500), nullable=False)
     biography: Mapped[str] = mapped_column(Text, nullable=False)
+    verification_status: Mapped[str] = mapped_column(
+        String(20),
+        nullable=False,
+        default="pending",
+        index=True,
+    )
+    verified_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
+    )
+    verified_by: Mapped[str | None] = mapped_column(String(255), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,

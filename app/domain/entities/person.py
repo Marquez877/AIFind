@@ -2,6 +2,8 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from uuid import UUID
 
+from app.domain.value_objects import VerificationStatus
+
 
 @dataclass(frozen=True)
 class Person:
@@ -14,6 +16,9 @@ class Person:
     region: str  # Регион
     accusation: str  # Обвинение
     biography: str  # Краткое описание/биография
+    verification_status: VerificationStatus = VerificationStatus.PENDING
+    verified_at: datetime | None = None
+    verified_by: str | None = None  # Email или ID модератора
     created_at: datetime = field(default_factory=datetime.utcnow)
     updated_at: datetime = field(default_factory=datetime.utcnow)
 

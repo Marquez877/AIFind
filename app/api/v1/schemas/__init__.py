@@ -6,7 +6,15 @@ from .conversation_schemas import (
 )
 from .customer_schemas import CustomerCreateRequest, CustomerResponse, CustomerUpdateRequest
 from .document_schemas import DocumentContentResponse, DocumentResponse
-from .person_schemas import PersonCreateRequest, PersonResponse, PersonUpdateRequest
+from .person_schemas import (
+	FiltersResponse,
+	PersonCreateRequest,
+	PersonResponse,
+	PersonSearchParams,
+	PersonSearchResponse,
+	PersonUpdateRequest,
+	VerifyPersonRequest,
+)
 from .chat_schemas import ChatRequest, ChatResponse, SemanticChatResponse, SourceReferenceResponse
 
 __all__ = [
@@ -20,6 +28,10 @@ __all__ = [
 	"PersonCreateRequest",
 	"PersonUpdateRequest",
 	"PersonResponse",
+	"PersonSearchParams",
+	"PersonSearchResponse",
+	"FiltersResponse",
+	"VerifyPersonRequest",
 	"DocumentResponse",
 	"DocumentContentResponse",
 	"ChatRequest",

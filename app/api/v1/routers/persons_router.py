@@ -1,6 +1,8 @@
+from math import ceil
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.dependencies import (
     get_create_person_uc,
@@ -8,9 +10,18 @@ from app.api.dependencies import (
     get_get_person_uc,
     get_list_persons_uc,
     get_update_person_uc,
+    get_person_repo,
 )
-from app.api.v1.schemas import PersonCreateRequest, PersonResponse, PersonUpdateRequest
+from app.api.v1.schemas import (
+    FiltersResponse,
+    PersonCreateRequest,
+    PersonResponse,
+    PersonSearchResponse,
+    PersonUpdateRequest,
+)
 from app.domain.errors import PersonAlreadyExistsError, PersonNotFoundError
+from app.infrastructure.repositories.person_repository import SQLAlchemyPersonRepository
+from app.providers import PersonRepository
 from app.use_cases.persons import (
     CreatePersonUseCase,
     DeletePersonUseCase,
@@ -47,6 +58,47 @@ async def create_person(
     return PersonResponse.model_validate(person)
 
 
+@router.get("/search", response_model=PersonSearchResponse)
+async def search_persons(
+    name: str | None = Query(default=None, description="Поиск по имени (частичное совпадение)"),
+    region: str | None = Query(default=None, description="Фильтр по региону"),
+    accusation_type: str | None = Query(default=None, description="Тип обвинения (частичное совпадение)"),
+    birth_year_from: int | None = Query(default=None, ge=1800, le=1960, description="Год рождения от"),
+    birth_year_to: int | None = Query(default=None, ge=1800, le=1960, description="Год рождения до"),
+    death_year_from: int | None = Query(default=None, ge=1800, le=1960, description="Год смерти от"),
+    death_year_to: int | None = Query(default=None, ge=1800, le=1960, description="Год смерти до"),
+    verification_status: str | None = Query(default=None, pattern="^(pending|verified|rejected)$", description="Статус верификации"),
+    page: int = Query(default=1, ge=1, description="Номер страницы"),
+    page_size: int = Query(default=20, ge=1, le=100, description="Размер страницы"),
+    person_repo: PersonRepository = Depends(get_person_repo),
+) -> PersonSearchResponse:
+    """Расширенный поиск по карточкам с пагинацией и фильтром по статусу верификации."""
+    offset = (page - 1) * page_size
+    
+    result = await person_repo.search(
+        name=name,
+        region=region,
+        accusation_type=accusation_type,
+        birth_year_from=birth_year_from,
+        birth_year_to=birth_year_to,
+        death_year_from=death_year_from,
+        death_year_to=death_year_to,
+        verification_status=verification_status,
+        limit=page_size,
+        offset=offset,
+    )
+    
+    total_pages = ceil(result.total / page_size) if result.total > 0 else 0
+    
+    return PersonSearchResponse(
+        items=[PersonResponse.model_validate(person) for person in result.items],
+        total=result.total,
+        page=page,
+        page_size=page_size,
+        pages=total_pages,
+    )
+
+
 @router.get("", response_model=list[PersonResponse])
 async def list_persons(
     name: str | None = Query(default=None, description="Поиск по имени"),
@@ -56,7 +108,7 @@ async def list_persons(
     offset: int = Query(default=0, ge=0),
     use_case: ListPersonsUseCase = Depends(get_list_persons_uc),
 ) -> list[PersonResponse]:
-    """Получить список карточек с фильтрацией."""
+    """Получить список карточек с фильтрацией (упрощённый)."""
     persons = await use_case.execute(name, region, accusation, limit, offset)
     return [PersonResponse.model_validate(person) for person in persons]
 

@@ -30,6 +30,28 @@ class PersonRepository(ABC):
         ...
 
     @abstractmethod
+    async def search(
+        self,
+        name: str | None = None,
+        region: str | None = None,
+        accusation_type: str | None = None,
+        birth_year_from: int | None = None,
+        birth_year_to: int | None = None,
+        death_year_from: int | None = None,
+        death_year_to: int | None = None,
+        verification_status: str | None = None,
+        limit: int = 20,
+        offset: int = 0,
+    ):
+        """Расширенный поиск с фильтрами и пагинацией."""
+        ...
+
+    @abstractmethod
+    async def get_filter_values(self):
+        """Получить доступные значения для фильтров."""
+        ...
+
+    @abstractmethod
     async def save(self, person: Person) -> Person:
         """Сохранить (создать или обновить) карточку."""
         ...
@@ -37,4 +59,9 @@ class PersonRepository(ABC):
     @abstractmethod
     async def delete(self, id: UUID) -> None:
         """Удалить карточку."""
+        ...
+
+    @abstractmethod
+    async def get_pending_moderation(self, limit: int = 50, offset: int = 0) -> list[Person]:
+        """Получить записи, ожидающие модерации."""
         ...

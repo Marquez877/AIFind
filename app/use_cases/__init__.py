@@ -6,6 +6,13 @@ from .customers import (
     ListCustomersUseCase,
     UpdateCustomerUseCase,
 )
+from .persons import (
+    CreatePersonUseCase,
+    DeletePersonUseCase,
+    GetPersonUseCase,
+    ListPersonsUseCase,
+    UpdatePersonUseCase,
+)
 
 __all__ = [
     "CreateCustomerUseCase",
@@ -15,5 +22,9 @@ __all__ = [
     "DeleteCustomerUseCase",
     "CreateConversationUseCase",
     "SendMessageUseCase",
+    "CreatePersonUseCase",
+    "GetPersonUseCase",
+    "ListPersonsUseCase",
+    "UpdatePersonUseCase",
+    "DeletePersonUseCase",
 ]
-

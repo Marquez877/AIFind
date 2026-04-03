@@ -1,3 +1,4 @@
+from .check_duplicates import CheckPersonDuplicatesUseCase
 from .create_person import CreatePersonUseCase
 from .delete_person import DeletePersonUseCase
 from .get_pending_moderation import GetPendingModerationUseCase
@@ -8,6 +9,7 @@ from .verify_person import VerifyPersonUseCase
 
 __all__ = [
     "CreatePersonUseCase",
+    "CheckPersonDuplicatesUseCase",
     "GetPersonUseCase",
     "ListPersonsUseCase",
     "UpdatePersonUseCase",

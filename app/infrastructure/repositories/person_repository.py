@@ -1,12 +1,12 @@
 from dataclasses import dataclass
 from uuid import UUID
 
-from sqlalchemy import func, select
+from sqlalchemy import func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.entities import Person
 from app.infrastructure.db.models import PersonModel
-from app.providers import PersonRepository
+from app.providers import DuplicateMatch, PersonRepository
 
 
 @dataclass
@@ -90,6 +90,102 @@ class SQLAlchemyPersonRepository(PersonRepository):
         if model is None:
             return None
         return self._to_entity(model)
+
+    async def set_biography_embedding(self, person_id: UUID, embedding: list[float]) -> None:
+        result = await self._session.execute(
+            select(PersonModel).where(PersonModel.id == person_id)
+        )
+        model = result.scalar_one_or_none()
+        if model is None:
+            return
+        model.biography_embedding = embedding
+        await self._session.commit()
+
+    async def find_potential_duplicates(
+        self,
+        full_name: str,
+        birth_year: int,
+        biography_embedding: list[float] | None,
+        limit: int = 5,
+    ) -> list[DuplicateMatch]:
+        if not full_name.strip():
+            return []
+
+        query = """
+            SELECT
+                p.id,
+                p.full_name,
+                p.birth_year,
+                p.death_year,
+                p.region,
+                p.accusation,
+                p.biography,
+                p.verification_status,
+                p.verified_at,
+                p.verified_by,
+                p.created_at,
+                p.updated_at,
+                similarity(lower(p.full_name), lower(:full_name)) AS name_similarity,
+                CASE
+                    WHEN :embedding IS NULL OR p.biography_embedding IS NULL THEN 0.0
+                    ELSE 1 - (p.biography_embedding <=> :embedding::vector)
+                END AS biography_similarity,
+                (
+                    0.7 * similarity(lower(p.full_name), lower(:full_name)) +
+                    0.2 * CASE WHEN p.birth_year = :birth_year THEN 1.0 ELSE 0.0 END +
+                    0.1 * CASE
+                        WHEN :embedding IS NULL OR p.biography_embedding IS NULL THEN 0.0
+                        ELSE 1 - (p.biography_embedding <=> :embedding::vector)
+                    END
+                ) AS score
+            FROM persons p
+            WHERE
+                similarity(lower(p.full_name), lower(:full_name)) >= 0.35
+                OR (p.birth_year = :birth_year AND similarity(lower(p.full_name), lower(:full_name)) >= 0.30)
+                OR (:embedding IS NOT NULL AND p.biography_embedding IS NOT NULL AND (1 - (p.biography_embedding <=> :embedding::vector)) >= 0.80)
+            ORDER BY score DESC
+            LIMIT :limit
+        """
+        embedding_str = None
+        if biography_embedding is not None:
+            embedding_str = "[" + ",".join(str(x) for x in biography_embedding) + "]"
+
+        result = await self._session.execute(
+            text(query),
+            {
+                "full_name": full_name,
+                "birth_year": birth_year,
+                "embedding": embedding_str,
+                "limit": limit,
+            },
+        )
+
+        rows = result.fetchall()
+        matches: list[DuplicateMatch] = []
+        for row in rows:
+            model = PersonModel(
+                id=row.id,
+                full_name=row.full_name,
+                birth_year=row.birth_year,
+                death_year=row.death_year,
+                region=row.region,
+                accusation=row.accusation,
+                biography=row.biography,
+                verification_status=row.verification_status,
+                verified_at=row.verified_at,
+                verified_by=row.verified_by,
+                created_at=row.created_at,
+                updated_at=row.updated_at,
+            )
+            matches.append(
+                DuplicateMatch(
+                    person=self._to_entity(model),
+                    score=float(row.score),
+                    name_similarity=float(row.name_similarity),
+                    biography_similarity=float(row.biography_similarity),
+                )
+            )
+        return matches
 
     async def list(
         self,

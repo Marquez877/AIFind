@@ -2,14 +2,20 @@ from uuid import uuid4
 
 from app.domain.entities import Person
 from app.domain.errors import PersonAlreadyExistsError
+from app.infrastructure.ai.embedding_service import EmbeddingService
 from app.providers import PersonRepository
 
 
 class CreatePersonUseCase:
     """Use case для создания карточки репрессированного."""
 
-    def __init__(self, repo: PersonRepository) -> None:
+    def __init__(
+        self,
+        repo: PersonRepository,
+        embedding_service: EmbeddingService,
+    ) -> None:
         self._repo = repo
+        self._embedding_service = embedding_service
 
     async def execute(
         self,
@@ -34,4 +40,7 @@ class CreatePersonUseCase:
             accusation=accusation,
             biography=biography,
         )
-        return await self._repo.save(person)
+        saved = await self._repo.save(person)
+        embedding = await self._embedding_service.get_embedding(saved.biography)
+        await self._repo.set_biography_embedding(saved.id, embedding)
+        return saved

@@ -74,6 +74,30 @@ class PersonSearchResponse(BaseModel):
     pages: int = Field(description="Всего страниц")
 
 
+class DuplicateMatchResponse(BaseModel):
+    """Найденный потенциальный дубль."""
+
+    person: PersonResponse
+    score: float = Field(ge=0.0, le=1.0, description="Итоговый скор похожести")
+    name_similarity: float = Field(ge=0.0, le=1.0, description="Схожесть имени")
+    biography_similarity: float = Field(ge=0.0, le=1.0, description="Схожесть биографии")
+
+
+class CheckDuplicatesRequest(BaseModel):
+    """Схема запроса на поиск дублей."""
+
+    full_name: str = Field(..., min_length=1, max_length=255)
+    birth_year: int = Field(..., ge=1800, le=1960)
+    biography: str = Field(..., min_length=1)
+    limit: int = Field(default=5, ge=1, le=20)
+
+
+class CheckDuplicatesResponse(BaseModel):
+    """Результат поиска потенциальных дублей."""
+
+    matches: list[DuplicateMatchResponse]
+
+
 class FiltersResponse(BaseModel):
     """Доступные значения фильтров."""
 

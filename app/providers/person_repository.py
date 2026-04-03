@@ -1,7 +1,18 @@
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from uuid import UUID
 
 from app.domain.entities import Person
+
+
+@dataclass
+class DuplicateMatch:
+    """Кандидат на дубликат с оценками похожести."""
+
+    person: Person
+    score: float
+    name_similarity: float
+    biography_similarity: float
 
 
 class PersonRepository(ABC):
@@ -64,4 +75,20 @@ class PersonRepository(ABC):
     @abstractmethod
     async def get_pending_moderation(self, limit: int = 50, offset: int = 0) -> list[Person]:
         """Получить записи, ожидающие модерации."""
+        ...
+
+    @abstractmethod
+    async def find_potential_duplicates(
+        self,
+        full_name: str,
+        birth_year: int,
+        biography_embedding: list[float] | None,
+        limit: int = 5,
+    ) -> list[DuplicateMatch]:
+        """Найти потенциальные дубли по нечёткому совпадению и эмбеддингам."""
+        ...
+
+    @abstractmethod
+    async def set_biography_embedding(self, person_id: UUID, embedding: list[float]) -> None:
+        """Сохранить эмбеддинг биографии для карточки."""
         ...

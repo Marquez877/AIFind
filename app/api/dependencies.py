@@ -19,6 +19,7 @@ from app.use_cases.customers import (
 	UpdateCustomerUseCase,
 )
 from app.use_cases.persons import (
+	CheckPersonDuplicatesUseCase,
 	CreatePersonUseCase,
 	DeletePersonUseCase,
 	GetPersonUseCase,
@@ -112,8 +113,9 @@ async def get_send_message_uc(
 # Person use cases
 async def get_create_person_uc(
 	repo: PersonRepository = Depends(get_person_repo),
+	embedding_service: EmbeddingService = Depends(get_embedding_service),
 ) -> CreatePersonUseCase:
-	return CreatePersonUseCase(repo)
+	return CreatePersonUseCase(repo, embedding_service)
 
 
 async def get_get_person_uc(
@@ -130,8 +132,16 @@ async def get_list_persons_uc(
 
 async def get_update_person_uc(
 	repo: PersonRepository = Depends(get_person_repo),
+	embedding_service: EmbeddingService = Depends(get_embedding_service),
 ) -> UpdatePersonUseCase:
-	return UpdatePersonUseCase(repo)
+	return UpdatePersonUseCase(repo, embedding_service)
+
+
+async def get_check_person_duplicates_uc(
+	repo: PersonRepository = Depends(get_person_repo),
+	embedding_service: EmbeddingService = Depends(get_embedding_service),
+) -> CheckPersonDuplicatesUseCase:
+	return CheckPersonDuplicatesUseCase(repo, embedding_service)
 
 
 async def get_delete_person_uc(

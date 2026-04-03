@@ -127,6 +127,7 @@ class PersonModel(Base):
     region: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
     accusation: Mapped[str] = mapped_column(String(500), nullable=False)
     biography: Mapped[str] = mapped_column(Text, nullable=False)
+    biography_embedding: Mapped[list[float] | None] = mapped_column(Vector(1536), nullable=True)
     verification_status: Mapped[str] = mapped_column(
         String(20),
         nullable=False,

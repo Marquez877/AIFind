@@ -3,14 +3,20 @@ from uuid import UUID
 
 from app.domain.entities import Person
 from app.domain.errors import PersonAlreadyExistsError, PersonNotFoundError
+from app.infrastructure.ai.embedding_service import EmbeddingService
 from app.providers import PersonRepository
 
 
 class UpdatePersonUseCase:
     """Use case для обновления карточки репрессированного."""
 
-    def __init__(self, repo: PersonRepository) -> None:
+    def __init__(
+        self,
+        repo: PersonRepository,
+        embedding_service: EmbeddingService,
+    ) -> None:
         self._repo = repo
+        self._embedding_service = embedding_service
 
     async def execute(
         self,
@@ -35,6 +41,7 @@ class UpdatePersonUseCase:
             if duplicate is not None and duplicate.id != person_id:
                 raise PersonAlreadyExistsError(new_name, new_birth_year, duplicate.id)
 
+        new_biography = biography if biography is not None else existing.biography
         updated_person = Person(
             id=existing.id,
             full_name=new_name,
@@ -42,8 +49,12 @@ class UpdatePersonUseCase:
             death_year=death_year if death_year is not None else existing.death_year,
             region=region if region is not None else existing.region,
             accusation=accusation if accusation is not None else existing.accusation,
-            biography=biography if biography is not None else existing.biography,
+            biography=new_biography,
             created_at=existing.created_at,
             updated_at=datetime.utcnow(),
         )
-        return await self._repo.save(updated_person)
+        saved = await self._repo.save(updated_person)
+        if biography is not None:
+            embedding = await self._embedding_service.get_embedding(new_biography)
+            await self._repo.set_biography_embedding(saved.id, embedding)
+        return saved

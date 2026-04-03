@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.dependencies import (
+    get_check_person_duplicates_uc,
     get_current_user,
     get_create_person_uc,
     get_delete_person_uc,
@@ -14,6 +15,9 @@ from app.api.dependencies import (
     get_person_repo,
 )
 from app.api.v1.schemas import (
+    CheckDuplicatesRequest,
+    CheckDuplicatesResponse,
+    DuplicateMatchResponse,
     FiltersResponse,
     PersonCreateRequest,
     PersonResponse,
@@ -25,6 +29,7 @@ from app.domain.errors import PersonAlreadyExistsError, PersonNotFoundError
 from app.infrastructure.repositories.person_repository import SQLAlchemyPersonRepository
 from app.providers import PersonRepository
 from app.use_cases.persons import (
+    CheckPersonDuplicatesUseCase,
     CreatePersonUseCase,
     DeletePersonUseCase,
     GetPersonUseCase,
@@ -59,6 +64,32 @@ async def create_person(
         ) from exc
 
     return PersonResponse.model_validate(person)
+
+
+@router.post("/check-duplicates", response_model=CheckDuplicatesResponse)
+async def check_duplicates(
+    payload: CheckDuplicatesRequest,
+    use_case: CheckPersonDuplicatesUseCase = Depends(get_check_person_duplicates_uc),
+    current_user: User = Depends(get_current_user),
+) -> CheckDuplicatesResponse:
+    """Проверить потенциальные дубли перед созданием карточки."""
+    result = await use_case.execute(
+        full_name=payload.full_name,
+        birth_year=payload.birth_year,
+        biography=payload.biography,
+        limit=payload.limit,
+    )
+    return CheckDuplicatesResponse(
+        matches=[
+            DuplicateMatchResponse(
+                person=PersonResponse.model_validate(match.person),
+                score=match.score,
+                name_similarity=match.name_similarity,
+                biography_similarity=match.biography_similarity,
+            )
+            for match in result.matches
+        ]
+    )
 
 
 @router.get("/search", response_model=PersonSearchResponse)

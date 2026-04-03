@@ -8,7 +8,10 @@ from .conversation_schemas import (
 from .customer_schemas import CustomerCreateRequest, CustomerResponse, CustomerUpdateRequest
 from .document_schemas import DocumentContentResponse, DocumentResponse
 from .person_schemas import (
+	CheckDuplicatesRequest,
+	CheckDuplicatesResponse,
 	FiltersResponse,
+	DuplicateMatchResponse,
 	PersonCreateRequest,
 	PersonResponse,
 	PersonSearchParams,
@@ -29,6 +32,9 @@ __all__ = [
 	"PersonCreateRequest",
 	"PersonUpdateRequest",
 	"PersonResponse",
+	"CheckDuplicatesRequest",
+	"CheckDuplicatesResponse",
+	"DuplicateMatchResponse",
 	"PersonSearchParams",
 	"PersonSearchResponse",
 	"FiltersResponse",

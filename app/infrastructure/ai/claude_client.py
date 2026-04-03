@@ -1,4 +1,5 @@
 import anthropic
+from typing import AsyncIterator
 
 from app.providers.ai_provider import AIProvider
 
@@ -58,3 +59,32 @@ class ClaudeClient(AIProvider):
             raise RuntimeError(f"Anthropic API request failed: {exc}") from exc
 
         return response.content[0].text
+
+    async def ask_with_context_stream(
+        self,
+        context: str,
+        question: str,
+    ) -> AsyncIterator[str]:
+        """Стримить ответ на вопрос на основе документов (RAG)."""
+        user_message = f"""Документы из архива:
+
+{context}
+
+---
+
+Вопрос: {question}
+
+Ответь на основе документов выше:"""
+
+        try:
+            async with self._client.messages.stream(
+                model="claude-sonnet-4-20250514",
+                max_tokens=1024,
+                system=ARCHIVE_SYSTEM_PROMPT,
+                messages=[{"role": "user", "content": user_message}],
+            ) as stream:
+                async for text in stream.text_stream:
+                    if text:
+                        yield text
+        except anthropic.APIError as exc:
+            raise RuntimeError(f"Anthropic API streaming request failed: {exc}") from exc

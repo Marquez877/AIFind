@@ -13,7 +13,8 @@ from app.infrastructure.repositories.user_repository import UserRepository
 from app.domain.entities import User
 from app.providers import AIProvider, ConversationRepository, CustomerRepository, DocumentRepository, PersonRepository
 from app.use_cases.conversations import CreateConversationUseCase, SendMessageUseCase
-
+from app.use_cases.rag import AskQuestionUseCase
+from app.use_cases.rag.semantic_search import SemanticSearchUseCase
 from app.use_cases.documents import (
 	DeleteDocumentUseCase,
 	GetDocumentUseCase,
@@ -27,8 +28,6 @@ from app.use_cases.customers import (
 	ListCustomersUseCase,
 	UpdateCustomerUseCase,
 )
-from app.use_cases.rag import AskQuestionUseCase
-from app.use_cases.rag.semantic_search import SemanticSearchUseCase
 from app.use_cases.persons import (
 	CheckPersonDuplicatesUseCase,
 	CreatePersonUseCase,
@@ -37,7 +36,6 @@ from app.use_cases.persons import (
 	ListPersonsUseCase,
 	UpdatePersonUseCase,
 )
-from app.wiring import build_user_repository
 from app.wiring import (
 	build_ai_provider,
 	build_chunk_repository,
@@ -244,7 +242,7 @@ async def get_semantic_search_uc(
 
 
 # User repository and auth
-
+from app.wiring import build_user_repository
 
 
 async def get_user_repo(session: AsyncSession = Depends(get_session_dependency)) -> UserRepository:

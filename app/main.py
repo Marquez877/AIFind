@@ -1,10 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.v1.routers import conversations_router, customers_router
+from app.api.v1.routers import conversations_router, customers_router, persons_router
 
 
-app = FastAPI(title="AI Assistant Backend")
+app = FastAPI(title="Голос из архива — Backend")
 
 app.add_middleware(
 	CORSMiddleware,
@@ -16,6 +16,7 @@ app.add_middleware(
 
 app.include_router(customers_router, prefix="/api/v1")
 app.include_router(conversations_router, prefix="/api/v1")
+app.include_router(persons_router, prefix="/api/v1")
 
 
 @app.get("/health")

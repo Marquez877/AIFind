@@ -21,8 +21,8 @@ depends_on: Sequence[str] | None = None
 
 
 def upgrade() -> None:
-    message_role = sa.Enum("user", "assistant", name="message_role")
-    message_role.create(op.get_bind(), checkfirst=True)
+    # Создаём enum через raw SQL чтобы избежать дублирования
+    op.execute("CREATE TYPE message_role AS ENUM ('user', 'assistant')")
 
     op.create_table(
         "customers",
@@ -53,7 +53,7 @@ def upgrade() -> None:
         "messages",
         sa.Column("id", postgresql.UUID(as_uuid=True), nullable=False),
         sa.Column("conversation_id", postgresql.UUID(as_uuid=True), nullable=False),
-        sa.Column("role", message_role, nullable=False),
+        sa.Column("role", postgresql.ENUM("user", "assistant", name="message_role", create_type=False), nullable=False),
         sa.Column("content", sa.Text(), nullable=False),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()),
         sa.ForeignKeyConstraint(["conversation_id"], ["conversations.id"], ondelete="CASCADE"),
@@ -77,6 +77,4 @@ def downgrade() -> None:
     op.drop_table("messages")
     op.drop_table("conversations")
     op.drop_table("customers")
-
-    message_role = sa.Enum("user", "assistant", name="message_role")
-    message_role.drop(op.get_bind(), checkfirst=True)
+    op.execute("DROP TYPE message_role")

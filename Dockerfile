@@ -22,6 +22,7 @@ WORKDIR /app
 COPY --from=builder /opt/venv /opt/venv
 COPY app ./app
 COPY alembic ./alembic
+COPY alembic.ini ./alembic.ini
 
 EXPOSE 8000
 

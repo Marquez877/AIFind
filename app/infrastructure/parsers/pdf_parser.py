@@ -7,7 +7,7 @@ from app.domain.services.document_parser import DocumentParser
 from app.domain.value_objects.document_type import DocumentType
 
 if TYPE_CHECKING:
-    import pdfplumber
+    pass
 
 
 class PdfParser(DocumentParser):

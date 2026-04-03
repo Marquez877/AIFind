@@ -2,7 +2,6 @@ from math import ceil
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.dependencies import (
     get_check_person_duplicates_uc,
@@ -18,7 +17,6 @@ from app.api.v1.schemas import (
     CheckDuplicatesRequest,
     CheckDuplicatesResponse,
     DuplicateMatchResponse,
-    FiltersResponse,
     PersonCreateRequest,
     PersonResponse,
     PersonSearchResponse,
@@ -26,7 +24,6 @@ from app.api.v1.schemas import (
 )
 from app.domain.entities import User
 from app.domain.errors import PersonAlreadyExistsError, PersonNotFoundError
-from app.infrastructure.repositories.person_repository import SQLAlchemyPersonRepository
 from app.providers import PersonRepository
 from app.use_cases.persons import (
     CheckPersonDuplicatesUseCase,

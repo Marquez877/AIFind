@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from app.domain.entities import User
-from app.domain.errors import InactiveUserError, InvalidCredentialsError, UserNotFoundError
+from app.domain.errors import InactiveUserError, InvalidCredentialsError
 from app.infrastructure.auth import JWTHandler
 from app.infrastructure.repositories.user_repository import UserRepository
 

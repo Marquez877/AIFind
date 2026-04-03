@@ -13,7 +13,6 @@ from app.api.dependencies import (
 from app.api.v1.schemas import DocumentContentResponse, DocumentResponse
 from app.domain.entities import User
 from app.domain.errors import DocumentNotFoundError, PersonNotFoundError
-from app.domain.value_objects.document_type import DocumentType
 from app.use_cases.documents import (
     DeleteDocumentUseCase,
     GetDocumentUseCase,

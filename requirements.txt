@@ -6,3 +6,4 @@ alembic
 pydantic-settings
 anthropic
 python-dotenv
+python-multipart

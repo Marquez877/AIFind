@@ -121,3 +121,37 @@ async def get_delete_person_uc(
 ) -> DeletePersonUseCase:
 	return DeletePersonUseCase(repo)
 
+
+# Document use cases
+from app.use_cases.documents import (
+	DeleteDocumentUseCase,
+	GetDocumentUseCase,
+	ListDocumentsUseCase,
+	UploadDocumentUseCase,
+)
+
+
+async def get_upload_document_uc(
+	person_repo: PersonRepository = Depends(get_person_repo),
+	document_repo: DocumentRepository = Depends(get_document_repo),
+) -> UploadDocumentUseCase:
+	return UploadDocumentUseCase(person_repo, document_repo)
+
+
+async def get_list_documents_uc(
+	person_repo: PersonRepository = Depends(get_person_repo),
+	document_repo: DocumentRepository = Depends(get_document_repo),
+) -> ListDocumentsUseCase:
+	return ListDocumentsUseCase(person_repo, document_repo)
+
+
+async def get_get_document_uc(
+	document_repo: DocumentRepository = Depends(get_document_repo),
+) -> GetDocumentUseCase:
+	return GetDocumentUseCase(document_repo)
+
+
+async def get_delete_document_uc(
+	document_repo: DocumentRepository = Depends(get_document_repo),
+) -> DeleteDocumentUseCase:
+	return DeleteDocumentUseCase(document_repo)

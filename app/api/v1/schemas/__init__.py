@@ -5,6 +5,7 @@ from .conversation_schemas import (
 	MessageSendRequest,
 )
 from .customer_schemas import CustomerCreateRequest, CustomerResponse, CustomerUpdateRequest
+from .document_schemas import DocumentContentResponse, DocumentResponse
 from .person_schemas import PersonCreateRequest, PersonResponse, PersonUpdateRequest
 
 __all__ = [
@@ -18,4 +19,6 @@ __all__ = [
 	"PersonCreateRequest",
 	"PersonUpdateRequest",
 	"PersonResponse",
+	"DocumentResponse",
+	"DocumentContentResponse",
 ]

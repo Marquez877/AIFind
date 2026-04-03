@@ -5,7 +5,7 @@ from uuid import UUID
 
 from app.domain.errors import PersonNotFoundError
 from app.infrastructure.ai.embedding_service import EmbeddingService
-from app.infrastructure.repositories.chunk_repository import ChunkRepository, ChunkSearchResult
+from app.infrastructure.repositories.chunk_repository import ChunkRepository
 from app.providers import AIProvider, DocumentRepository, PersonRepository
 
 

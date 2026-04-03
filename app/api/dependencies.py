@@ -13,6 +13,13 @@ from app.infrastructure.repositories.user_repository import UserRepository
 from app.domain.entities import User
 from app.providers import AIProvider, ConversationRepository, CustomerRepository, DocumentRepository, PersonRepository
 from app.use_cases.conversations import CreateConversationUseCase, SendMessageUseCase
+from app.wiring import build_user_repository
+from app.use_cases.documents import (
+	DeleteDocumentUseCase,
+	GetDocumentUseCase,
+	ListDocumentsUseCase,
+	UploadDocumentUseCase,
+)
 from app.use_cases.customers import (
 	CreateCustomerUseCase,
 	DeleteCustomerUseCase,
@@ -168,12 +175,7 @@ async def get_delete_person_uc(
 
 
 # Document use cases
-from app.use_cases.documents import (
-	DeleteDocumentUseCase,
-	GetDocumentUseCase,
-	ListDocumentsUseCase,
-	UploadDocumentUseCase,
-)
+
 
 
 async def get_upload_document_uc(
@@ -240,7 +242,7 @@ async def get_semantic_search_uc(
 
 
 # User repository and auth
-from app.wiring import build_user_repository
+
 
 
 async def get_user_repo(session: AsyncSession = Depends(get_session_dependency)) -> UserRepository:

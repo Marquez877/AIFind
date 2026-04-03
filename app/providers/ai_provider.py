@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import AsyncIterator
 
 
 class AIProvider(ABC):
@@ -16,4 +17,13 @@ class AIProvider(ABC):
         question: str,
     ) -> str:
         """Ответить на вопрос на основе предоставленного контекста (RAG)."""
+        ...
+
+    @abstractmethod
+    async def ask_with_context_stream(
+        self,
+        context: str,
+        question: str,
+    ) -> AsyncIterator[str]:
+        """Стримить ответ на основе предоставленного контекста (RAG)."""
         ...

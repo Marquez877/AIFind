@@ -1,3 +1,4 @@
+from .auth_schemas import AuthResponse, LoginRequest, RegisterRequest, TokenResponse, UserResponse
 from .conversation_schemas import (
 	ConversationCreateRequest,
 	ConversationResponse,
@@ -38,4 +39,9 @@ __all__ = [
 	"ChatResponse",
 	"SemanticChatResponse",
 	"SourceReferenceResponse",
+	"AuthResponse",
+	"LoginRequest",
+	"RegisterRequest",
+	"TokenResponse",
+	"UserResponse",
 ]

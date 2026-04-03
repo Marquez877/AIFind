@@ -2,8 +2,9 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
-from app.api.dependencies import get_person_repo
+from app.api.dependencies import get_person_repo, require_role
 from app.api.v1.schemas import PersonResponse, VerifyPersonRequest
+from app.domain.entities import User
 from app.domain.errors import PersonNotFoundError
 from app.domain.value_objects import VerificationStatus
 from app.providers import PersonRepository
@@ -18,6 +19,7 @@ async def get_pending_moderation(
     limit: int = Query(default=50, ge=1, le=100, description="Количество записей"),
     offset: int = Query(default=0, ge=0, description="Смещение"),
     person_repo: PersonRepository = Depends(get_person_repo),
+    current_user: User = Depends(require_role("moderator", "admin")),
 ) -> list[PersonResponse]:
     """Получить список карточек, ожидающих модерации (статус pending)."""
     use_case = GetPendingModerationUseCase(person_repo)
@@ -30,6 +32,7 @@ async def verify_person(
     person_id: UUID,
     payload: VerifyPersonRequest,
     person_repo: PersonRepository = Depends(get_person_repo),
+    current_user: User = Depends(require_role("moderator", "admin")),
 ) -> PersonResponse:
     """Изменить статус верификации карточки.
     

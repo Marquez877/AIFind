@@ -6,6 +6,7 @@ class Settings(BaseSettings):
 	ANTHROPIC_API_KEY: str
 	OPENAI_API_KEY: str = ""  # For embeddings (text-embedding-3-small)
 	APP_ENV: str = "development"
+	JWT_SECRET_KEY: str = "your-secret-key-please-change-this-in-production-use-openssl-rand-hex-32"
 	
 	# Chunking settings
 	CHUNK_SIZE: int = 800

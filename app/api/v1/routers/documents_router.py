@@ -4,12 +4,14 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, File, HTTPException, Response, UploadFile, status
 
 from app.api.dependencies import (
+    get_current_user,
     get_delete_document_uc,
     get_get_document_uc,
     get_list_documents_uc,
     get_upload_document_uc,
 )
 from app.api.v1.schemas import DocumentContentResponse, DocumentResponse
+from app.domain.entities import User
 from app.domain.errors import DocumentNotFoundError, PersonNotFoundError
 from app.use_cases.documents import (
     DeleteDocumentUseCase,
@@ -33,6 +35,7 @@ async def upload_document(
     person_id: UUID,
     file: UploadFile = File(...),
     use_case: UploadDocumentUseCase = Depends(get_upload_document_uc),
+    current_user: User = Depends(get_current_user),
 ) -> DocumentResponse:
     """Загрузить документ к карточке (.txt или .md)."""
     if not file.filename:
@@ -116,6 +119,7 @@ async def get_document(
 async def delete_document(
     document_id: UUID,
     use_case: DeleteDocumentUseCase = Depends(get_delete_document_uc),
+    current_user: User = Depends(get_current_user),
 ) -> Response:
     """Удалить документ."""
     try:

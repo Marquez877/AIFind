@@ -1,3 +1,11 @@
+from .auth_errors import (
+    ForbiddenError,
+    InactiveUserError,
+    InvalidCredentialsError,
+    UnauthorizedError,
+    UserAlreadyExistsError,
+    UserNotFoundError,
+)
 from .conversation_errors import ConversationNotFoundError
 from .customer_errors import CustomerAlreadyExistsError, CustomerNotFoundError
 from .document_errors import DocumentNotFoundError
@@ -10,4 +18,10 @@ __all__ = [
     "PersonNotFoundError",
     "PersonAlreadyExistsError",
     "DocumentNotFoundError",
+    "UserNotFoundError",
+    "UserAlreadyExistsError",
+    "InvalidCredentialsError",
+    "InactiveUserError",
+    "UnauthorizedError",
+    "ForbiddenError",
 ]

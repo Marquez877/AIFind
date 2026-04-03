@@ -1,8 +1,14 @@
-from fastapi import Depends
+from typing import Annotated
+
+from fastapi import Depends, Header, HTTPException, status
+from jose import JWTError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.infrastructure.ai.embedding_service import EmbeddingService
+from app.infrastructure.auth import JWTHandler
 from app.infrastructure.repositories.chunk_repository import ChunkRepository
+from app.infrastructure.repositories.user_repository import UserRepository
+from app.domain.entities import User
 from app.providers import AIProvider, ConversationRepository, CustomerRepository, DocumentRepository, PersonRepository
 from app.use_cases.conversations import CreateConversationUseCase, SendMessageUseCase
 from app.use_cases.customers import (
@@ -194,3 +200,85 @@ async def get_semantic_search_uc(
 	return SemanticSearchUseCase(
 		person_repo, document_repo, chunk_repo, embedding_service, ai_provider
 	)
+
+
+# User repository and auth
+from app.wiring import build_user_repository
+
+
+async def get_user_repo(session: AsyncSession = Depends(get_session_dependency)) -> UserRepository:
+	return build_user_repository(session)
+
+
+async def get_current_user(
+	authorization: Annotated[str | None, Header()] = None,
+	user_repo: UserRepository = Depends(get_user_repo),
+):
+	"""Получить текущего пользователя из JWT токена."""
+	if not authorization:
+		raise HTTPException(
+			status_code=status.HTTP_401_UNAUTHORIZED,
+			detail="Missing authorization header",
+			headers={"WWW-Authenticate": "Bearer"},
+		)
+
+	try:
+		scheme, token = authorization.split()
+		if scheme.lower() != "bearer":
+			raise HTTPException(
+				status_code=status.HTTP_401_UNAUTHORIZED,
+				detail="Invalid authentication scheme",
+				headers={"WWW-Authenticate": "Bearer"},
+			)
+	except ValueError:
+		raise HTTPException(
+			status_code=status.HTTP_401_UNAUTHORIZED,
+			detail="Invalid authorization header format",
+			headers={"WWW-Authenticate": "Bearer"},
+		)
+
+	try:
+		payload = JWTHandler.decode_token(token)
+		email: str = payload.get("sub")
+		if email is None:
+			raise HTTPException(
+				status_code=status.HTTP_401_UNAUTHORIZED,
+				detail="Invalid token payload",
+				headers={"WWW-Authenticate": "Bearer"},
+			)
+	except JWTError:
+		raise HTTPException(
+			status_code=status.HTTP_401_UNAUTHORIZED,
+			detail="Invalid or expired token",
+			headers={"WWW-Authenticate": "Bearer"},
+		)
+
+	user = await user_repo.get_by_email(email)
+	if user is None:
+		raise HTTPException(
+			status_code=status.HTTP_401_UNAUTHORIZED,
+			detail="User not found",
+			headers={"WWW-Authenticate": "Bearer"},
+		)
+
+	if not user.is_active:
+		raise HTTPException(
+			status_code=status.HTTP_403_FORBIDDEN,
+			detail="Inactive user",
+		)
+
+	return user
+
+
+def require_role(*allowed_roles: str):
+	"""Декоратор для проверки роли пользователя."""
+
+	async def role_checker(current_user: User = Depends(get_current_user)) -> User:
+		if current_user.role.value not in allowed_roles:
+			raise HTTPException(
+				status_code=status.HTTP_403_FORBIDDEN,
+				detail=f"Insufficient permissions. Required roles: {', '.join(allowed_roles)}",
+			)
+		return current_user
+
+	return role_checker

@@ -9,6 +9,7 @@ from app.api.v1.routers import (
 	filters_router,
 	persons_router,
 )
+from app.api.v1.routers.auth_router import router as auth_router
 from app.api.v1.routers.moderation_router import router as moderation_router
 from app.api.v1.routers.person_conversations_router import router as person_conversations_router
 
@@ -23,6 +24,7 @@ app.add_middleware(
 	allow_headers=["*"],
 )
 
+app.include_router(auth_router, prefix="/api/v1")
 app.include_router(customers_router, prefix="/api/v1")
 app.include_router(conversations_router, prefix="/api/v1")
 app.include_router(persons_router, prefix="/api/v1")

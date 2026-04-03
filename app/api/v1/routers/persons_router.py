@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.dependencies import (
+    get_current_user,
     get_create_person_uc,
     get_delete_person_uc,
     get_get_person_uc,
@@ -19,6 +20,7 @@ from app.api.v1.schemas import (
     PersonSearchResponse,
     PersonUpdateRequest,
 )
+from app.domain.entities import User
 from app.domain.errors import PersonAlreadyExistsError, PersonNotFoundError
 from app.infrastructure.repositories.person_repository import SQLAlchemyPersonRepository
 from app.providers import PersonRepository
@@ -38,6 +40,7 @@ router = APIRouter(prefix="/persons", tags=["persons"])
 async def create_person(
     payload: PersonCreateRequest,
     use_case: CreatePersonUseCase = Depends(get_create_person_uc),
+    current_user: User = Depends(get_current_user),
 ) -> PersonResponse:
     """Создать карточку репрессированного."""
     try:
@@ -135,6 +138,7 @@ async def update_person(
     person_id: UUID,
     payload: PersonUpdateRequest,
     use_case: UpdatePersonUseCase = Depends(get_update_person_uc),
+    current_user: User = Depends(get_current_user),
 ) -> PersonResponse:
     """Обновить карточку."""
     updates = payload.model_dump(exclude_unset=True)
@@ -159,6 +163,7 @@ async def update_person(
 async def delete_person(
     person_id: UUID,
     use_case: DeletePersonUseCase = Depends(get_delete_person_uc),
+    current_user: User = Depends(get_current_user),
 ) -> Response:
     """Удалить карточку."""
     try:

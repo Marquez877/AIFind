@@ -12,6 +12,7 @@ from app.infrastructure.repositories import (
 )
 from app.infrastructure.repositories.chunk_repository import ChunkRepository
 from app.infrastructure.repositories.person_conversation_repository import PersonConversationRepository
+from app.infrastructure.repositories.user_repository import UserRepository
 from app.providers import AIProvider, ConversationRepository, CustomerRepository, DocumentRepository, PersonRepository
 
 
@@ -45,6 +46,10 @@ def build_embedding_service() -> EmbeddingService:
 
 def build_person_conversation_repository(session: AsyncSession) -> PersonConversationRepository:
     return PersonConversationRepository(session)
+
+
+def build_user_repository(session: AsyncSession) -> UserRepository:
+    return UserRepository(session)
 
 
 get_session_dependency = get_session

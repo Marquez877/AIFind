@@ -12,3 +12,7 @@ python-multipart
 pgvector
 numpy
 openai
+
+# Authentication (JWT)
+passlib[bcrypt]
+python-jose[cryptography]

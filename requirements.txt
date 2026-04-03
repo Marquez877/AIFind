@@ -7,3 +7,8 @@ pydantic-settings
 anthropic
 python-dotenv
 python-multipart
+
+# Semantic search (pgvector)
+pgvector
+numpy
+openai

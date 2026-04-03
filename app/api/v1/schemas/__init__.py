@@ -7,7 +7,7 @@ from .conversation_schemas import (
 from .customer_schemas import CustomerCreateRequest, CustomerResponse, CustomerUpdateRequest
 from .document_schemas import DocumentContentResponse, DocumentResponse
 from .person_schemas import PersonCreateRequest, PersonResponse, PersonUpdateRequest
-from .chat_schemas import ChatRequest, ChatResponse
+from .chat_schemas import ChatRequest, ChatResponse, SemanticChatResponse, SourceReferenceResponse
 
 __all__ = [
 	"CustomerCreateRequest",
@@ -24,4 +24,6 @@ __all__ = [
 	"DocumentContentResponse",
 	"ChatRequest",
 	"ChatResponse",
+	"SemanticChatResponse",
+	"SourceReferenceResponse",
 ]

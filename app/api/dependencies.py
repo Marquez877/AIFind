@@ -1,6 +1,8 @@
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.infrastructure.ai.embedding_service import EmbeddingService
+from app.infrastructure.repositories.chunk_repository import ChunkRepository
 from app.providers import AIProvider, ConversationRepository, CustomerRepository, DocumentRepository, PersonRepository
 from app.use_cases.conversations import CreateConversationUseCase, SendMessageUseCase
 from app.use_cases.customers import (
@@ -19,9 +21,11 @@ from app.use_cases.persons import (
 )
 from app.wiring import (
 	build_ai_provider,
+	build_chunk_repository,
 	build_conversation_repository,
 	build_customer_repository,
 	build_document_repository,
+	build_embedding_service,
 	build_person_repository,
 	get_session_dependency,
 )
@@ -41,6 +45,14 @@ async def get_person_repo(session: AsyncSession = Depends(get_session_dependency
 
 async def get_document_repo(session: AsyncSession = Depends(get_session_dependency)) -> DocumentRepository:
 	return build_document_repository(session)
+
+
+async def get_chunk_repo(session: AsyncSession = Depends(get_session_dependency)) -> ChunkRepository:
+	return build_chunk_repository(session)
+
+
+async def get_embedding_service() -> EmbeddingService:
+	return build_embedding_service()
 
 
 async def get_create_customer_uc(
@@ -134,8 +146,10 @@ from app.use_cases.documents import (
 async def get_upload_document_uc(
 	person_repo: PersonRepository = Depends(get_person_repo),
 	document_repo: DocumentRepository = Depends(get_document_repo),
+	chunk_repo: ChunkRepository = Depends(get_chunk_repo),
+	embedding_service: EmbeddingService = Depends(get_embedding_service),
 ) -> UploadDocumentUseCase:
-	return UploadDocumentUseCase(person_repo, document_repo)
+	return UploadDocumentUseCase(person_repo, document_repo, chunk_repo, embedding_service)
 
 
 async def get_list_documents_uc(
@@ -159,6 +173,7 @@ async def get_delete_document_uc(
 
 # RAG use case
 from app.use_cases.rag import AskQuestionUseCase
+from app.use_cases.rag.semantic_search import SemanticSearchUseCase
 
 
 async def get_ask_question_uc(
@@ -167,3 +182,15 @@ async def get_ask_question_uc(
 	ai_provider: AIProvider = Depends(get_claude_client),
 ) -> AskQuestionUseCase:
 	return AskQuestionUseCase(person_repo, document_repo, ai_provider)
+
+
+async def get_semantic_search_uc(
+	person_repo: PersonRepository = Depends(get_person_repo),
+	document_repo: DocumentRepository = Depends(get_document_repo),
+	chunk_repo: ChunkRepository = Depends(get_chunk_repo),
+	embedding_service: EmbeddingService = Depends(get_embedding_service),
+	ai_provider: AIProvider = Depends(get_claude_client),
+) -> SemanticSearchUseCase:
+	return SemanticSearchUseCase(
+		person_repo, document_repo, chunk_repo, embedding_service, ai_provider
+	)

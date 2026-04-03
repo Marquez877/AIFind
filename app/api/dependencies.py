@@ -155,3 +155,15 @@ async def get_delete_document_uc(
 	document_repo: DocumentRepository = Depends(get_document_repo),
 ) -> DeleteDocumentUseCase:
 	return DeleteDocumentUseCase(document_repo)
+
+
+# RAG use case
+from app.use_cases.rag import AskQuestionUseCase
+
+
+async def get_ask_question_uc(
+	person_repo: PersonRepository = Depends(get_person_repo),
+	document_repo: DocumentRepository = Depends(get_document_repo),
+	ai_provider: AIProvider = Depends(get_claude_client),
+) -> AskQuestionUseCase:
+	return AskQuestionUseCase(person_repo, document_repo, ai_provider)

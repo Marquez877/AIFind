@@ -27,7 +27,12 @@ class CheckPersonDuplicatesUseCase:
         biography: str,
         limit: int = 5,
     ) -> CheckDuplicatesResult:
-        biography_embedding = await self._embedding_service.get_embedding(biography)
+        try:
+            biography_embedding = await self._embedding_service.get_embedding(biography)
+        except Exception:
+            # Fallback to name/year duplicate checks when embeddings are unavailable.
+            biography_embedding = None
+
         matches = await self._person_repo.find_potential_duplicates(
             full_name=full_name,
             birth_year=birth_year,

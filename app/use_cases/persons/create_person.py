@@ -41,6 +41,12 @@ class CreatePersonUseCase:
             biography=biography,
         )
         saved = await self._repo.save(person)
-        embedding = await self._embedding_service.get_embedding(saved.biography)
-        await self._repo.set_biography_embedding(saved.id, embedding)
+
+        try:
+            embedding = await self._embedding_service.get_embedding(saved.biography)
+            await self._repo.set_biography_embedding(saved.id, embedding)
+        except Exception:
+            # Keep person creation successful even if embeddings provider is unavailable.
+            pass
+
         return saved

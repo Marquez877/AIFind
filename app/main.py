@@ -3,7 +3,6 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1.routers import (
 	chat_router,
-	conversations_router,
 	documents_router,
 	filters_router,
 	persons_router,
@@ -24,7 +23,6 @@ app.add_middleware(
 )
 
 app.include_router(auth_router, prefix="/api/v1")
-app.include_router(conversations_router, prefix="/api/v1")
 app.include_router(persons_router, prefix="/api/v1")
 app.include_router(documents_router, prefix="/api/v1")
 app.include_router(chat_router, prefix="/api/v1")

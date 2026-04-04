@@ -1,17 +1,4 @@
 services:
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    env_file:
-      - .env
-    depends_on:
-      db:
-        condition: service_healthy
-    restart: always
-    networks:
-      - internal
-
   db:
     image: pgvector/pgvector:pg16
     environment:
@@ -30,6 +17,34 @@ services:
     networks:
       - internal
 
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    command: ["alembic", "upgrade", "head"]
+    networks:
+      - internal
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    restart: always
+    networks:
+      - internal
+
   nginx:
     image: nginx:alpine
     ports:
@@ -41,19 +56,6 @@ services:
     depends_on:
       - app
     restart: always
-    networks:
-      - internal
-
-  migrate:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    env_file:
-      - .env
-    depends_on:
-      db:
-        condition: service_healthy
-    command: ["alembic", "upgrade", "head"]
     networks:
       - internal
 

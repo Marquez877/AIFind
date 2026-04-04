@@ -1,13 +1,16 @@
 from .base import Base
-from .models import AISessionModel, ConversationModel, CustomerModel, MessageModel
+from .models import AISessionModel, PersonModel, DocumentModel, ChunkModel, PersonConversationModel, PersonMessageModel, UserModel
 from .session import AsyncSessionFactory, engine, get_session
 
 __all__ = [
 	"Base",
-	"CustomerModel",
-	"ConversationModel",
-	"MessageModel",
 	"AISessionModel",
+	"PersonModel",
+	"DocumentModel",
+	"ChunkModel",
+	"PersonConversationModel",
+	"PersonMessageModel",
+	"UserModel",
 	"engine",
 	"AsyncSessionFactory",
 	"get_session",

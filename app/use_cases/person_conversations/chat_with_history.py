@@ -63,7 +63,7 @@ class ChatWithHistoryUseCase:
         person_id: UUID,
         question: str,
         conversation_id: UUID | None = None,
-        use_semantic_search: bool = True,
+        use_semantic_search: bool = False,
         top_k: int | None = None,
     ) -> ChatWithHistoryResult:
         """Execute chat with conversation history.

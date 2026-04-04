@@ -10,7 +10,6 @@ class PersonMessageCreate(BaseModel):
     """Схема для отправки сообщения в диалог."""
     
     question: str = Field(..., min_length=1, max_length=2000, description="Вопрос пользователя")
-    use_semantic_search: bool = Field(default=True, description="Использовать семантический поиск")
 
 
 class PersonMessageResponse(BaseModel):
@@ -55,5 +54,3 @@ class ChatWithHistoryRequest(BaseModel):
     """Запрос для чата с учётом истории диалога."""
     
     question: str = Field(..., min_length=1, max_length=2000)
-    use_semantic_search: bool = Field(default=True)
-    top_k: int = Field(default=3, ge=1, le=10)

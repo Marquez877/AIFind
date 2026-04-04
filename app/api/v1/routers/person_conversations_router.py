@@ -169,8 +169,7 @@ async def chat_with_history(
             person_id=person_id,
             question=payload.question,
             conversation_id=conversation_id,
-            use_semantic_search=payload.use_semantic_search,
-            top_k=payload.top_k,
+            use_semantic_search=False,
         )
     except PersonNotFoundError:
         raise HTTPException(status_code=404, detail="Карточка не найдена")
@@ -216,8 +215,7 @@ async def start_new_chat(
             person_id=person_id,
             question=payload.question,
             conversation_id=None,  # Creates new conversation
-            use_semantic_search=payload.use_semantic_search,
-            top_k=payload.top_k,
+            use_semantic_search=False,
         )
     except PersonNotFoundError:
         raise HTTPException(status_code=404, detail="Карточка не найдена")

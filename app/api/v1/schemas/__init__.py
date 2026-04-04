@@ -1,5 +1,5 @@
 from .auth_schemas import AuthResponse, LoginRequest, RegisterRequest, TokenResponse, UserResponse
-from .chat_schemas import ChatRequest, ChatResponse, SemanticChatResponse, SourceReferenceResponse
+from .chat_schemas import ChatRequest, ChatResponse
 from .document_schemas import DocumentContentResponse, DocumentResponse
 from .person_schemas import (
     CheckDuplicatesRequest,
@@ -31,8 +31,6 @@ __all__ = [
     "PersonSearchResponse",
     "PersonUpdateRequest",
     "RegisterRequest",
-    "SemanticChatResponse",
-    "SourceReferenceResponse",
     "TokenResponse",
     "UserResponse",
     "VerifyPersonRequest",

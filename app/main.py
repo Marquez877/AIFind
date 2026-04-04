@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.config import settings
 from app.api.v1.routers import (
 	chat_router,
 	documents_router,
@@ -16,7 +17,8 @@ app = FastAPI(title="Голос из архива — Backend")
 
 app.add_middleware(
 	CORSMiddleware,
-	allow_origins=["*"],
+	allow_origins=settings.cors_origins,
+	allow_origin_regex=settings.CORS_ALLOW_ORIGIN_REGEX,
 	allow_credentials=True,
 	allow_methods=["*"],
 	allow_headers=["*"],

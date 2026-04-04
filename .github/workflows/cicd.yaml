@@ -64,6 +64,8 @@ jobs:
         run: pip install -r requirements.txt pytest pytest-asyncio
 
       - name: Run tests
+        env:
+          PYTHONPATH: ${{ github.workspace }}
         run: |
           if [ -d "tests" ]; then
             pytest tests/ -v

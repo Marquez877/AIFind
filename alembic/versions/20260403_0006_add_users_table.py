@@ -18,25 +18,10 @@ depends_on = None
 
 
 def upgrade() -> None:
-    # 1. Создаём ENUM (без падения, если уже есть)
-    op.execute("""
-        DO $$ BEGIN
-            CREATE TYPE user_role AS ENUM ('user', 'moderator', 'admin');
-        EXCEPTION
-            WHEN duplicate_object THEN null;
-        END $$;
-    """)
-
-    # 2. Используем готовый ENUM (ВАЖНО: create_type=False)
-    user_role_enum = ENUM(
-        'user',
-        'moderator',
-        'admin',
-        name='user_role',
-        create_type=False
-    )
-
-    # 3. Создаём таблицу
+    # Create user_role enum
+    op.execute("CREATE TYPE user_role AS ENUM ('user', 'moderator', 'admin')")
+    
+    # Create users table
     op.create_table(
         'users',
         sa.Column('id', postgresql.UUID(as_uuid=True), primary_key=True),

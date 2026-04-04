@@ -4,21 +4,16 @@ from app.config import settings
 from app.infrastructure.ai.claude_client import ClaudeClient
 from app.infrastructure.ai.embedding_service import EmbeddingService
 from app.infrastructure.db.session import get_session
-from app.infrastructure.storage import LocalDocumentStorage
 from app.infrastructure.repositories import (
     SQLAlchemyConversationRepository,
-    SQLAlchemyCustomerRepository,
     SQLAlchemyDocumentRepository,
     SQLAlchemyPersonRepository,
 )
 from app.infrastructure.repositories.chunk_repository import ChunkRepository
 from app.infrastructure.repositories.person_conversation_repository import PersonConversationRepository
 from app.infrastructure.repositories.user_repository import UserRepository
-from app.providers import AIProvider, ConversationRepository, CustomerRepository, DocumentRepository, PersonRepository
-
-
-def build_customer_repository(session: AsyncSession) -> CustomerRepository:
-    return SQLAlchemyCustomerRepository(session)
+from app.infrastructure.storage import LocalDocumentStorage
+from app.providers import AIProvider, ConversationRepository, DocumentRepository, PersonRepository
 
 
 def build_conversation_repository(session: AsyncSession) -> ConversationRepository:

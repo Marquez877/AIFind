@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.config import settings
 from app.api.v1.routers import (
 	chat_router,
 	documents_router,
@@ -17,8 +16,7 @@ app = FastAPI(title="Голос из архива — Backend")
 
 app.add_middleware(
 	CORSMiddleware,
-	allow_origins=settings.cors_origins,
-	allow_origin_regex=settings.CORS_ALLOW_ORIGIN_REGEX,
+	allow_origins=["*"],
 	allow_credentials=True,
 	allow_methods=["*"],
 	allow_headers=["*"],
@@ -31,12 +29,6 @@ app.include_router(chat_router, prefix="/api/v1")
 app.include_router(filters_router, prefix="/api/v1")
 app.include_router(moderation_router, prefix="/api/v1")
 app.include_router(person_conversations_router, prefix="/api/v1")
-
-
-@app.get("/")
-async def root() -> dict[str, str]:
-	return {"status": "ok", "health": "/health", "docs": "/docs"}
-
 
 @app.get("/health")
 async def health() -> dict[str, str]:

@@ -30,6 +30,19 @@ services:
     networks:
       - internal
 
+  seed:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    command: ["python", "load_seed.py"]
+    networks:
+      - internal
+
   app:
     build:
       context: .
@@ -39,7 +52,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-      migrate:
+      seed:
         condition: service_completed_successfully
     restart: always
     networks:

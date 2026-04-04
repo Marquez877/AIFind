@@ -1,6 +1,7 @@
 from typing import Annotated
 
-from fastapi import Depends, Header, HTTPException, status
+from fastapi import Depends, HTTPException, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -44,6 +45,7 @@ from app.wiring import (
 # ─────────────────────────────────────────────────────────────────────────────
 
 _parser_factory = ParserFactory()
+_bearer_scheme = HTTPBearer(auto_error=False)
 
 
 def get_parser_factory() -> ParserFactory:
@@ -181,19 +183,14 @@ async def get_semantic_search_uc(
 # ─────────────────────────────────────────────────────────────────────────────
 
 async def get_current_user(
-    authorization: Annotated[str | None, Header()] = None,
+    credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(_bearer_scheme)] = None,
     user_repo: UserRepository = Depends(get_user_repo),
 ) -> User:
     """Получить текущего пользователя из JWT токена."""
-    if not authorization:
+    if credentials is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing authorization header")
 
-    try:
-        scheme, token = authorization.split()
-        if scheme.lower() != "bearer":
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid authentication scheme")
-    except ValueError:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid authorization header format")
+    token = credentials.credentials
 
     try:
         payload = JWTHandler.decode_token(token)

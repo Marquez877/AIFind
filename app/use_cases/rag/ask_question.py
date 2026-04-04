@@ -61,6 +61,18 @@ class AskQuestionUseCase:
         full_context = person_info + "\n\n" + context
 
         # 5. Вызвать LLM
-        answer = await self._ai_provider.ask_with_context(full_context, question)
+        try:
+            answer = await self._ai_provider.ask_with_context(full_context, question)
+        except Exception:
+            # Fallback keeps chat available when external LLM is temporarily unavailable.
+            answer = self._build_fallback_answer(person)
 
         return ChatResult(answer=answer, sources=sources)
+
+    @staticmethod
+    def _build_fallback_answer(person) -> str:
+        return (
+            f"По данным карточки, человек был обвинён по статье/формулировке: {person.accusation}. "
+            "Сейчас ИИ-сервис временно недоступен, поэтому даю ответ по информации карточки. "
+            "Если нужны детали причин и контекста ареста, проверьте прикреплённые документы."
+        )

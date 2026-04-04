@@ -23,6 +23,8 @@ COPY --from=builder /opt/venv /opt/venv
 COPY app ./app
 COPY alembic ./alembic
 COPY alembic.ini ./alembic.ini
+COPY load_seed.py ./load_seed.py
+COPY docs/seed.json ./docs/seed.json
 
 EXPOSE 8000
 

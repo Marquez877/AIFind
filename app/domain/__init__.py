@@ -1,19 +1,18 @@
-from .entities import Conversation, Customer, Message, MessageRole
-from .errors import (
-	ConversationNotFoundError,
-	CustomerAlreadyExistsError,
-	CustomerNotFoundError,
-)
-from .value_objects import CustomerId, Email
+from .entities import Conversation, Document, Message, MessageRole, Person, User
+from .errors import ConversationNotFoundError, DocumentNotFoundError, PersonNotFoundError
+from .value_objects import Email, UserRole, VerificationStatus
 
 __all__ = [
-	"Customer",
-	"Conversation",
-	"Message",
-	"MessageRole",
-	"Email",
-	"CustomerId",
-	"CustomerNotFoundError",
-	"CustomerAlreadyExistsError",
-	"ConversationNotFoundError",
+    "Conversation",
+    "ConversationNotFoundError",
+    "Document",
+    "DocumentNotFoundError",
+    "Email",
+    "Message",
+    "MessageRole",
+    "Person",
+    "PersonNotFoundError",
+    "User",
+    "UserRole",
+    "VerificationStatus",
 ]

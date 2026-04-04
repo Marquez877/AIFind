@@ -33,6 +33,11 @@ app.include_router(moderation_router, prefix="/api/v1")
 app.include_router(person_conversations_router, prefix="/api/v1")
 
 
+@app.get("/")
+async def root() -> dict[str, str]:
+	return {"status": "ok", "health": "/health", "docs": "/docs"}
+
+
 @app.get("/health")
 async def health() -> dict[str, str]:
     return {"status": "ok"}

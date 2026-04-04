@@ -12,7 +12,7 @@ from .base import Base
 
 
 message_role_enum = Enum("user", "assistant", name="message_role")
-user_role_enum = Enum("user", "moderator", "admin", name="user_role")
+user_role_enum = Enum("user", "moderator", "admin", name="user_role", create_type=False)
 
 
 class CustomerModel(Base):
